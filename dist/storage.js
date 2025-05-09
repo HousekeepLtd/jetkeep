@@ -34,6 +34,23 @@ export const getJets = async () => {
         return [];
     }
 };
+// Get a jet by ID
+export const getJet = async (id) => {
+    try {
+        await initStorage();
+        const data = await fs.readFile(JETS_FILE, 'utf8');
+        const jets = JSON.parse(data);
+        const jet = jets.jets.find(jet => jet.id === id);
+        if (!jet) {
+            throw new Error(`Jet with ID ${id} not found`);
+        }
+        return jet;
+    }
+    catch (err) {
+        console.error('Failed to get jet:', err);
+        throw err;
+    }
+};
 // Add a new jet
 export const addJet = async (jet) => {
     try {
@@ -44,7 +61,8 @@ export const addJet = async (jet) => {
         const newJet = {
             id: Date.now().toString(),
             createdAt: new Date().toISOString(),
-            ...jet
+            ...jet,
+            status: jet.status || 'active' // Default status
         };
         jets.jets.push(newJet);
         await fs.writeFile(JETS_FILE, JSON.stringify(jets, null, 2));
@@ -52,6 +70,30 @@ export const addJet = async (jet) => {
     }
     catch (err) {
         console.error('Failed to add jet:', err);
+        throw err;
+    }
+};
+// Update a jet by ID
+export const updateJet = async (id, updates) => {
+    try {
+        await initStorage();
+        const data = await fs.readFile(JETS_FILE, 'utf8');
+        const jets = JSON.parse(data);
+        const jetIndex = jets.jets.findIndex(jet => jet.id === id);
+        if (jetIndex === -1) {
+            throw new Error(`Jet with ID ${id} not found`);
+        }
+        // Update the jet with the new values
+        const updatedJet = {
+            ...jets.jets[jetIndex],
+            ...updates
+        };
+        jets.jets[jetIndex] = updatedJet;
+        await fs.writeFile(JETS_FILE, JSON.stringify(jets, null, 2));
+        return updatedJet;
+    }
+    catch (err) {
+        console.error('Failed to update jet:', err);
         throw err;
     }
 };
