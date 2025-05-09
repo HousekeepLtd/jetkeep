@@ -11,7 +11,402 @@ servers:
   - url: https://api.jetkeep.com
     description: Production server
 
+# Security scheme definitions
+security:
+  - bearerAuth: []
+  - apiKeyAuth: []
+
 paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account
+      operationId: registerUser
+      tags:
+        - Authentication
+      security: []  # No authentication required for registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterInput'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/auth/login:
+    post:
+      summary: User login
+      description: Authenticates a user and returns a token
+      operationId: loginUser
+      tags:
+        - Authentication
+      security: []  # No authentication required for login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/auth/profile:
+    get:
+      summary: Get user profile
+      description: Returns the profile of the authenticated user
+      operationId: getUserProfile
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/auth/api-key:
+    post:
+      summary: Generate API key
+      description: Generates a new API key for the authenticated user
+      operationId: generateApiKey
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: API key generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'API key generated successfully'
+                  apiKey:
+                    type: string
+                    example: '9f8d3b7c2e1a6f0d4b8c2e0a9f8d7b6c5a4e3d2b1a0f9e8d7c6b5a4e3d2'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      summary: Revoke API key
+      description: Revokes the API key for the authenticated user
+      operationId: revokeApiKey
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: API key revoked successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'API key revoked successfully'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/users:
+    get:
+      summary: Get all users
+      description: Returns a list of all users (admin only)
+      operationId: getUsers
+      tags:
+        - Users
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: Create a new user
+      description: Adds a new user (admin only)
+      operationId: createUser
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/users/{id}:
+    get:
+      summary: Get a user by ID
+      description: Returns a single user by ID (admin or own account)
+      operationId: getUserById
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      summary: Update a user
+      description: Updates an existing user (admin or own account)
+      operationId: updateUser
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateInput'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      summary: Delete a user
+      description: Removes a user (admin only)
+      operationId: deleteUser
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User deleted successfully"
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /api/jets:
     get:
       summary: Get all jets
@@ -28,6 +423,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Jet'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Server error
           content:
@@ -60,6 +461,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Server error
           content:
@@ -88,6 +495,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Jet'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Jet not found
           content:
@@ -133,6 +546,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Jet not found
           content:
@@ -148,7 +567,7 @@ paths:
     
     delete:
       summary: Delete a jet
-      description: Removes a jet from the database
+      description: Removes a jet from the database (admin only)
       operationId: deleteJet
       tags:
         - Jets
@@ -170,6 +589,18 @@ paths:
                   message:
                     type: string
                     example: "Jet deleted successfully"
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Jet not found
           content:
@@ -184,7 +615,213 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT authorization token
+    
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication
+
   schemas:
+    RegisterInput:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          description: Username for the new account
+          example: "john_doe"
+        email:
+          type: string
+          format: email
+          description: Email address
+          example: "john@example.com"
+        password:
+          type: string
+          format: password
+          description: Password for the account
+          example: "securepassword123"
+    
+    LoginInput:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address
+          example: "john@example.com"
+        password:
+          type: string
+          format: password
+          description: Account password
+          example: "securepassword123"
+    
+    AuthResponse:
+      type: object
+      required:
+        - message
+        - token
+        - user
+      properties:
+        message:
+          type: string
+          description: Status message
+          example: "Login successful"
+        token:
+          type: string
+          description: JWT authentication token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              description: User ID
+              example: "60d21b4667d0d8992e610c85"
+            username:
+              type: string
+              description: Username
+              example: "john_doe"
+            email:
+              type: string
+              description: Email address
+              example: "john@example.com"
+            role:
+              type: string
+              enum: [user, admin]
+              description: User role
+              example: "user"
+    
+    UserProfile:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - role
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: User ID
+          example: "60d21b4667d0d8992e610c85"
+        username:
+          type: string
+          description: Username
+          example: "john_doe"
+        email:
+          type: string
+          description: Email address
+          example: "john@example.com"
+        role:
+          type: string
+          enum: [user, admin]
+          description: User role
+          example: "user"
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation date
+          example: "2023-05-09T12:00:00Z"
+        hasApiKey:
+          type: boolean
+          description: Whether the user has an API key
+          example: true
+    
+    UserInput:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          description: Username
+          example: "john_doe"
+        email:
+          type: string
+          format: email
+          description: Email address
+          example: "john@example.com"
+        password:
+          type: string
+          format: password
+          description: Account password
+          example: "securepassword123"
+        role:
+          type: string
+          enum: [user, admin]
+          description: User role (admin only can set this)
+          example: "user"
+    
+    UserUpdateInput:
+      type: object
+      properties:
+        username:
+          type: string
+          description: New username
+          example: "john_smith"
+        email:
+          type: string
+          format: email
+          description: New email address
+          example: "johnsmith@example.com"
+        password:
+          type: string
+          format: password
+          description: New password
+          example: "newsecurepassword123"
+        role:
+          type: string
+          enum: [user, admin]
+          description: New role (admin only can change this)
+          example: "admin"
+    
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - role
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: User ID
+          example: "60d21b4667d0d8992e610c85"
+        username:
+          type: string
+          description: Username
+          example: "john_doe"
+        email:
+          type: string
+          description: Email address
+          example: "john@example.com"
+        role:
+          type: string
+          enum: [user, admin]
+          description: User role
+          example: "user"
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation date
+          example: "2023-05-09T12:00:00Z"
+    
     JetInput:
       type: object
       required:
