@@ -1,5 +1,7 @@
 import express from 'express';
-import { McpServer, StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+
 import { z } from 'zod';
 import { connectDB } from '../db/connection.js';
 import Jet from '../db/models/Jet.js';
