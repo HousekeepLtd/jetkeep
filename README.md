@@ -143,11 +143,11 @@ A default admin user is created automatically with:
 ### API Endpoints
 
 **Jets**
-- `GET /api/jets` - Get all jets (requires authentication)
-- `GET /api/jets/:id` - Get a specific jet by ID (requires authentication)
-- `POST /api/jets` - Create a new jet (requires authentication)
-- `PUT /api/jets/:id` - Update a jet (requires authentication)
-- `DELETE /api/jets/:id` - Delete a jet (requires admin role)
+- `GET /api/jets` - Get all jets (admin sees all, regular users see only their own)
+- `GET /api/jets/:id` - Get a specific jet by ID (only owner or admin can view)
+- `POST /api/jets` - Create a new jet (user becomes the owner)
+- `PUT /api/jets/:id` - Update a jet (only owner or admin can update)
+- `DELETE /api/jets/:id` - Delete a jet (only owner or admin can delete)
 
 **Users**
 - `GET /api/users` - Get all users (requires admin role)
@@ -246,11 +246,11 @@ curl -X POST http://localhost:3001/mcp/run \
 
 ### Available MCP Functions
 
-- `list_jets` - List all jets in the system
-- `get_jet` - Get details of a specific jet by ID
-- `create_jet` - Add a new jet to the system
-- `update_jet` - Update an existing jet's information
-- `delete_jet` - Delete a jet from the system
+- `list_jets` - List all jets in the system (admin sees all, regular users see only their own)
+- `get_jet` - Get details of a specific jet by ID (only owner or admin can view)
+- `create_jet` - Add a new jet to the system (user becomes the owner)
+- `update_jet` - Update an existing jet's information (only owner or admin can update)
+- `delete_jet` - Delete a jet from the system (only owner or admin can delete)
 
 ### MCP Schema
 

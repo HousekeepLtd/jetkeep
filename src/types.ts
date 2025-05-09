@@ -6,6 +6,7 @@ export interface Jet {
   createdAt: string;
   status?: 'active' | 'maintenance' | 'grounded';
   notes?: string;
+  owner: string; // Owner ID (user ID)
 }
 
 export interface JetData {
@@ -18,6 +19,7 @@ export interface NewJet {
   location?: string;
   status?: 'active' | 'maintenance' | 'grounded';
   notes?: string;
+  owner: string; // Owner ID (user ID)
 }
 
 export interface UpdateJet {

@@ -7,6 +7,8 @@ interface McpFunctionParams extends Record<string, any> {
   name?: string;
   type?: string;
   location?: string;
+  userId?: string; // Current user's ID
+  isAdmin?: boolean; // Whether the current user is an admin
 }
 
 // Interface for MCP function response
@@ -16,10 +18,22 @@ interface McpFunctionResponse {
   message?: string;
 }
 
-// Get all jets
+// Get all jets (respecting ownership)
 export const listJets = async (params: McpFunctionParams): Promise<McpFunctionResponse> => {
   try {
-    const jets = await Jet.find().sort({ createdAt: -1 });
+    const { userId, isAdmin } = params;
+    
+    if (!userId) {
+      return {
+        status: 'error',
+        message: 'User ID is required'
+      };
+    }
+    
+    // Build query based on user role
+    const query = isAdmin ? {} : { owner: userId };
+    
+    const jets = await Jet.find(query).sort({ createdAt: -1 });
     return {
       status: 'success',
       data: jets
@@ -33,21 +47,40 @@ export const listJets = async (params: McpFunctionParams): Promise<McpFunctionRe
   }
 };
 
-// Get a single jet by ID
+// Get a single jet by ID (respecting ownership)
 export const getJet = async (params: McpFunctionParams): Promise<McpFunctionResponse> => {
   try {
-    if (!params.id) {
+    const { id, userId, isAdmin } = params;
+    
+    if (!id) {
       return {
         status: 'error',
         message: 'Jet ID is required'
       };
     }
+    
+    if (!userId) {
+      return {
+        status: 'error',
+        message: 'User ID is required'
+      };
+    }
 
-    const jet = await Jet.findById(params.id);
+    const jet = await Jet.findById(id);
     if (!jet) {
       return {
         status: 'error',
         message: 'Jet not found'
+      };
+    }
+    
+    // Check if user is admin or the owner of the jet
+    const isOwner = jet.owner.toString() === userId;
+    
+    if (!isAdmin && !isOwner) {
+      return {
+        status: 'error',
+        message: 'Access denied. You do not own this jet.'
       };
     }
 
@@ -64,10 +97,10 @@ export const getJet = async (params: McpFunctionParams): Promise<McpFunctionResp
   }
 };
 
-// Create a new jet
+// Create a new jet (with owner)
 export const createJet = async (params: McpFunctionParams): Promise<McpFunctionResponse> => {
   try {
-    const { name, type, location } = params;
+    const { name, type, location, userId } = params;
     
     if (!name) {
       return {
@@ -76,10 +109,18 @@ export const createJet = async (params: McpFunctionParams): Promise<McpFunctionR
       };
     }
     
+    if (!userId) {
+      return {
+        status: 'error',
+        message: 'User ID is required'
+      };
+    }
+    
     const newJet = new Jet({
       name,
       type,
-      location
+      location,
+      owner: userId
     });
     
     const savedJet = await newJet.save();
@@ -97,15 +138,42 @@ export const createJet = async (params: McpFunctionParams): Promise<McpFunctionR
   }
 };
 
-// Update a jet
+// Update a jet (respecting ownership)
 export const updateJet = async (params: McpFunctionParams): Promise<McpFunctionResponse> => {
   try {
-    const { id, name, type, location } = params;
+    const { id, name, type, location, userId, isAdmin } = params;
     
     if (!id) {
       return {
         status: 'error',
         message: 'Jet ID is required'
+      };
+    }
+    
+    if (!userId) {
+      return {
+        status: 'error',
+        message: 'User ID is required'
+      };
+    }
+    
+    // First check if jet exists
+    const jet = await Jet.findById(id);
+    
+    if (!jet) {
+      return {
+        status: 'error',
+        message: 'Jet not found'
+      };
+    }
+    
+    // Check if user is admin or the owner of the jet
+    const isOwner = jet.owner.toString() === userId;
+    
+    if (!isAdmin && !isOwner) {
+      return {
+        status: 'error',
+        message: 'Access denied. You do not own this jet.'
       };
     }
 
@@ -121,13 +189,6 @@ export const updateJet = async (params: McpFunctionParams): Promise<McpFunctionR
       { new: true, runValidators: true }
     );
     
-    if (!updatedJet) {
-      return {
-        status: 'error',
-        message: 'Jet not found'
-      };
-    }
-    
     return {
       status: 'success',
       data: updatedJet,
@@ -142,10 +203,10 @@ export const updateJet = async (params: McpFunctionParams): Promise<McpFunctionR
   }
 };
 
-// Delete a jet
+// Delete a jet (respecting ownership)
 export const deleteJet = async (params: McpFunctionParams): Promise<McpFunctionResponse> => {
   try {
-    const { id } = params;
+    const { id, userId, isAdmin } = params;
     
     if (!id) {
       return {
@@ -153,15 +214,35 @@ export const deleteJet = async (params: McpFunctionParams): Promise<McpFunctionR
         message: 'Jet ID is required'
       };
     }
-
-    const deletedJet = await Jet.findByIdAndDelete(id);
     
-    if (!deletedJet) {
+    if (!userId) {
+      return {
+        status: 'error',
+        message: 'User ID is required'
+      };
+    }
+    
+    // First check if jet exists
+    const jet = await Jet.findById(id);
+    
+    if (!jet) {
       return {
         status: 'error',
         message: 'Jet not found'
       };
     }
+    
+    // Check if user is admin or the owner of the jet
+    const isOwner = jet.owner.toString() === userId;
+    
+    if (!isAdmin && !isOwner) {
+      return {
+        status: 'error',
+        message: 'Access denied. You do not own this jet.'
+      };
+    }
+    
+    await Jet.findByIdAndDelete(id);
     
     return {
       status: 'success',

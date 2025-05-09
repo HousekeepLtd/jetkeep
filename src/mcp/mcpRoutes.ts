@@ -20,7 +20,7 @@ router.post('/run', authenticateApiKey, async (req, res) => {
       return;
     }
     
-    const response = await processFunctionCalls(function_calls);
+    const response = await processFunctionCalls(function_calls, req);
     res.json(response);
   } catch (error) {
     console.error('Error processing function calls:', error);

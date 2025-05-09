@@ -24,8 +24,15 @@ export const handleMcpFunctionCall = async (req: Request, res: Response): Promis
       return;
     }
     
+    // Add user information to the parameters
+    const paramsWithUser = {
+      ...parameters || {},
+      userId: req.user.id,
+      isAdmin: req.user.role === 'admin'
+    };
+    
     const functionToCall = functionMap[name];
-    const result = await functionToCall(parameters || {});
+    const result = await functionToCall(paramsWithUser);
     
     res.status(result.status === 'success' ? 200 : 400).json(result);
   } catch (error) {
@@ -38,7 +45,7 @@ export const handleMcpFunctionCall = async (req: Request, res: Response): Promis
 };
 
 // Process MCP function calls and format response
-export const processFunctionCalls = async (functionCalls: McpFunctionCall[]): Promise<McpResponse> => {
+export const processFunctionCalls = async (functionCalls: McpFunctionCall[], req?: Request): Promise<McpResponse> => {
   try {
     // Handle only the first function call for simplicity
     // A more advanced implementation would handle multiple calls
@@ -53,7 +60,14 @@ export const processFunctionCalls = async (functionCalls: McpFunctionCall[]): Pr
     const { name, parameters } = functionCall;
     const functionToCall = functionMap[name];
     
-    const result = await functionToCall(parameters || {});
+    // Add user information to the parameters if request object is available
+    const paramsWithUser = req ? {
+      ...parameters || {},
+      userId: req.user.id,
+      isAdmin: req.user.role === 'admin'
+    } : parameters || {};
+    
+    const result = await functionToCall(paramsWithUser);
     
     if (result.status === 'error') {
       return { 

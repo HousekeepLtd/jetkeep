@@ -1,6 +1,6 @@
 import express from 'express';
 import * as jetController from '../controllers/jetController.js';
-import { authenticate, authenticateApiKey, isAdmin } from '../middleware/auth.js';
+import { authenticate, authenticateApiKey } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -17,19 +17,19 @@ router.use((req, res, next) => {
   });
 });
 
-// Get all jets - available to all authenticated users
+// Get all jets (users see their own, admins see all)
 router.get('/', jetController.getJets);
 
-// Get a single jet by ID - available to all authenticated users
+// Get a single jet by ID (only owner or admin can view)
 router.get('/:id', jetController.getJetById);
 
-// Create a new jet - available to all authenticated users
+// Create a new jet (user becomes owner)
 router.post('/', jetController.createJet);
 
-// Update a jet - available to all authenticated users
+// Update a jet (only owner or admin can update)
 router.put('/:id', jetController.updateJet);
 
-// Delete a jet - only admins can delete
-router.delete('/:id', isAdmin, jetController.deleteJet);
+// Delete a jet (only owner or admin can delete)
+router.delete('/:id', jetController.deleteJet);
 
 export default router;

@@ -846,6 +846,7 @@ components:
         - _id
         - name
         - createdAt
+        - owner
       properties:
         _id:
           type: string
@@ -863,6 +864,10 @@ components:
           type: string
           description: Where the jet is stored or located
           example: "Hangar 5"
+        owner:
+          type: string
+          description: ID of the user who owns this jet
+          example: "60d21b4667d0d8992e610c85"
         createdAt:
           type: string
           format: date-time

@@ -43,7 +43,7 @@ const createMcpRouter = (): Router => {
       
       // If we have function calls, process them
       if (response.function_calls && response.function_calls.length > 0) {
-        const functionResult = await processFunctionCalls(response.function_calls);
+        const functionResult = await processFunctionCalls(response.function_calls, req);
         return res.json(functionResult);
       }
       
@@ -199,12 +199,12 @@ export const createMcpServer = (port = 3001) => {
       functions: [
         {
           name: "list_jets",
-          description: "List all jets in the system",
+          description: "List all jets in the system (admin sees all, regular users see only their own)",
           parameters: {}
         },
         {
           name: "get_jet",
-          description: "Get details of a specific jet by ID",
+          description: "Get details of a specific jet by ID (only owner or admin can view)",
           parameters: {
             id: {
               type: "string",
@@ -214,7 +214,7 @@ export const createMcpServer = (port = 3001) => {
         },
         {
           name: "create_jet",
-          description: "Add a new jet to the system",
+          description: "Add a new jet to the system (user becomes the owner)",
           parameters: {
             name: {
               type: "string",
@@ -232,7 +232,7 @@ export const createMcpServer = (port = 3001) => {
         },
         {
           name: "update_jet",
-          description: "Update an existing jet's information",
+          description: "Update an existing jet's information (only owner or admin can update)",
           parameters: {
             id: {
               type: "string",
@@ -254,7 +254,7 @@ export const createMcpServer = (port = 3001) => {
         },
         {
           name: "delete_jet",
-          description: "Delete a jet from the system",
+          description: "Delete a jet from the system (only owner or admin can delete)",
           parameters: {
             id: {
               type: "string",
