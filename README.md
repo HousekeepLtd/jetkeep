@@ -121,13 +121,40 @@ npm run server:dev
 
 The server will start at http://localhost:3000 (or the port specified in your `.env` file).
 
+### Authentication
+
+The API includes user authentication and role-based access control:
+
+- Register a new user: `POST /api/auth/register`
+- Login to get a JWT token: `POST /api/auth/login`
+- View your profile: `GET /api/auth/profile` (requires authentication)
+- Generate an API key: `POST /api/auth/api-key` (requires authentication)
+- Revoke an API key: `DELETE /api/auth/api-key` (requires authentication)
+
+You can access protected endpoints using:
+1. JWT token in the Authorization header: `Authorization: Bearer <token>`
+2. API key in the X-API-Key header: `X-API-Key: <api-key>`
+
+A default admin user is created automatically with:
+- Email: admin@jetkeep.com (customizable via ADMIN_EMAIL env variable)
+- Password: admin123 (customizable via ADMIN_PASSWORD env variable)
+- Username: admin (customizable via ADMIN_USERNAME env variable)
+
 ### API Endpoints
 
-- `GET /api/jets` - Get all jets
-- `GET /api/jets/:id` - Get a specific jet by ID
-- `POST /api/jets` - Create a new jet
-- `PUT /api/jets/:id` - Update a jet
-- `DELETE /api/jets/:id` - Delete a jet
+**Jets**
+- `GET /api/jets` - Get all jets (requires authentication)
+- `GET /api/jets/:id` - Get a specific jet by ID (requires authentication)
+- `POST /api/jets` - Create a new jet (requires authentication)
+- `PUT /api/jets/:id` - Update a jet (requires authentication)
+- `DELETE /api/jets/:id` - Delete a jet (requires admin role)
+
+**Users**
+- `GET /api/users` - Get all users (requires admin role)
+- `GET /api/users/:id` - Get a specific user (own account or admin role)
+- `POST /api/users` - Create a new user (requires admin role)
+- `PUT /api/users/:id` - Update a user (own account or admin role)
+- `DELETE /api/users/:id` - Delete a user (requires admin role)
 
 ### API Documentation
 
@@ -136,11 +163,28 @@ The API is documented using OpenAPI/Swagger:
 - Access the interactive API documentation at: `http://localhost:3000/api-docs`
 - The OpenAPI schema is available at: `openapi.yaml`
 
-### Creating a New Jet
+### Example: Creating a New Jet
 
 ```bash
+# First login to get a token
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@jetkeep.com", "password": "admin123"}'
+
+# Then use the token to create a jet
 curl -X POST http://localhost:3000/api/jets \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{"name": "Boeing 747", "type": "Commercial", "location": "Hangar 5"}'
+
+# Or generate an API key for easier access
+curl -X POST http://localhost:3000/api/auth/api-key \
+  -H "Authorization: Bearer <your-token>"
+
+# Then use the API key
+curl -X POST http://localhost:3000/api/jets \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-api-key>" \
   -d '{"name": "Boeing 747", "type": "Commercial", "location": "Hangar 5"}'
 ```
 
@@ -162,6 +206,55 @@ Jets are stored with the following structure:
 CLI version stores your jet data in `~/.jetkeep/jets.json`.
 
 API version stores data in MongoDB.
+
+## MCP (Model Context Protocol) Server
+
+Jetkeep includes a built-in MCP server that allows AI agents to interact with the system.
+
+### MCP Setup
+
+The MCP server runs automatically when you start the main server with `npm run server`. It listens on port 3001 by default (configurable with the MCP_PORT environment variable).
+
+### Using the MCP Server
+
+The MCP server provides:
+
+1. A natural language interface at `/v1/generate` that processes messages and returns answers or function calls
+2. A direct function execution interface at `/mcp/function` (requires API key)
+3. A function call processing endpoint at `/mcp/run` (requires API key)
+
+### Example MCP Interaction
+
+```bash
+# Natural language query
+curl -X POST http://localhost:3001/v1/generate \
+  -H "Content-Type: application/json" \
+  -d '{"messages": [{"role": "user", "content": "List all jets"}]}'
+
+# Direct function execution
+curl -X POST http://localhost:3001/mcp/function \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-api-key>" \
+  -d '{"name": "list_jets", "parameters": {}}'
+
+# Process function calls
+curl -X POST http://localhost:3001/mcp/run \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-api-key>" \
+  -d '{"function_calls": [{"name": "list_jets", "parameters": {}}]}'
+```
+
+### Available MCP Functions
+
+- `list_jets` - List all jets in the system
+- `get_jet` - Get details of a specific jet by ID
+- `create_jet` - Add a new jet to the system
+- `update_jet` - Update an existing jet's information
+- `delete_jet` - Delete a jet from the system
+
+### MCP Schema
+
+The MCP API schema is available at `http://localhost:3001/schema`
 
 ## Development
 
