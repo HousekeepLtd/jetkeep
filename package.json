@@ -16,7 +16,8 @@
     "server:dev": "tsx watch src/server.ts",
     "test:api": "tsx scripts/test-api.js",
     "test:mcp": "tsx scripts/test-mcp.js",
-    "test:auth": "tsx scripts/test-auth.js"
+    "test:auth": "tsx scripts/test-auth.js",
+    "test:official-mcp": "tsx scripts/test-official-mcp.js"
   },
   "keywords": [
     "cli",
@@ -26,6 +27,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.11.1",
     "bcryptjs": "^3.0.2",
     "chalk": "^5.3.0",
     "commander": "^11.0.0",

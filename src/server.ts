@@ -9,7 +9,8 @@ import { connectDB } from './db/connection.js';
 import jetRoutes from './routes/jetRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import { createMcpServer } from './mcp/mcpServer.js';
+import { createMcpServer as createCustomMcpServer } from './mcp/mcpServer.js';
+import { createMcpServer as createOfficialMcpServer } from './official-mcp/mcpServer.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ const swaggerDocument = YAML.load(path.join(__dirname, '../openapi.yaml'));
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MCP_PORT = process.env.MCP_PORT || 3001;
+const OFFICIAL_MCP_PORT = process.env.OFFICIAL_MCP_PORT || 3002;
 
 // Middleware
 app.use(cors());
@@ -76,9 +78,14 @@ app.listen(PORT, () => {
   createAdminUser();
 });
 
-// Start MCP server on different port
-const mcpServer = createMcpServer(Number(MCP_PORT));
+// Start custom MCP server
+const mcpServer = createCustomMcpServer(Number(MCP_PORT));
 mcpServer.start();
-console.log(`MCP Server running on port ${MCP_PORT}`);
+console.log(`Custom MCP Server running on port ${MCP_PORT}`);
+
+// Start official MCP server
+const officialMcpServer = await createOfficialMcpServer(Number(OFFICIAL_MCP_PORT));
+officialMcpServer.start();
+console.log(`Official MCP Server running on port ${OFFICIAL_MCP_PORT}`);
 
 export default app;

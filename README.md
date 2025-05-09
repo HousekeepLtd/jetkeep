@@ -207,23 +207,30 @@ CLI version stores your jet data in `~/.jetkeep/jets.json`.
 
 API version stores data in MongoDB.
 
-## MCP (Model Context Protocol) Server
+## MCP (Model Context Protocol) Servers
 
-Jetkeep includes a built-in MCP server that allows AI agents to interact with the system.
+Jetkeep includes two separate MCP servers that allow AI agents to interact with the system:
+
+1. **Custom MCP Server** - A custom implementation following MCP principles
+2. **Official MCP Server** - An implementation using the official TypeScript SDK
+
+Both servers provide the same functionality but with different implementations.
 
 ### MCP Setup
 
-The MCP server runs automatically when you start the main server with `npm run server`. It listens on port 3001 by default (configurable with the MCP_PORT environment variable).
+Both MCP servers run automatically when you start the main server with `npm run server`:
+- Custom MCP server listens on port 3001 by default (configurable with the MCP_PORT environment variable)
+- Official MCP server listens on port 3002 by default (configurable with the OFFICIAL_MCP_PORT environment variable)
 
-### Using the MCP Server
+### Custom MCP Server
 
-The MCP server provides:
+The custom MCP server provides:
 
 1. A natural language interface at `/v1/generate` that processes messages and returns answers or function calls
 2. A direct function execution interface at `/mcp/function` (requires API key)
 3. A function call processing endpoint at `/mcp/run` (requires API key)
 
-### Example MCP Interaction
+### Example Custom MCP Interaction
 
 ```bash
 # Natural language query
@@ -244,7 +251,25 @@ curl -X POST http://localhost:3001/mcp/run \
   -d '{"function_calls": [{"name": "list_jets", "parameters": {}}]}'
 ```
 
-### Available MCP Functions
+### Official MCP Server
+
+The official MCP server follows the MCP 1.0 specification using the official TypeScript SDK:
+
+```bash
+# Natural language query
+curl -X POST http://localhost:3002/v1 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-api-key>" \
+  -d '{"messages": [{"role": "user", "content": "List all jets"}]}'
+
+# Direct function call
+curl -X POST http://localhost:3002/v1 \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-api-key>" \
+  -d '{"functions": [{"name": "list_jets", "arguments": "{}"}]}'
+```
+
+### Available MCP Functions (Both Servers)
 
 - `list_jets` - List all jets in the system (admin sees all, regular users see only their own)
 - `get_jet` - Get details of a specific jet by ID (only owner or admin can view)
@@ -254,7 +279,8 @@ curl -X POST http://localhost:3001/mcp/run \
 
 ### MCP Schema
 
-The MCP API schema is available at `http://localhost:3001/schema`
+- Custom MCP server schema: `http://localhost:3001/schema`
+- Official MCP server uses standard MCP 1.0 protocol
 
 ## Development
 
