@@ -2,21 +2,33 @@
   "name": "jetkeep",
   "version": "1.0.0",
   "description": "A project for managing and keeping track of your jets.",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "bin": {
-    "jetkeep": "./src/index.js"
+    "jetkeep": "./dist/index.js"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node --esm src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run build"
   },
-  "keywords": ["cli", "jets", "management"],
+  "keywords": [
+    "cli",
+    "jets",
+    "management"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^5.3.0",
     "commander": "^11.0.0",
-    "inquirer": "^9.2.7",
-    "chalk": "^5.3.0"
+    "inquirer": "^9.2.7"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
 }
