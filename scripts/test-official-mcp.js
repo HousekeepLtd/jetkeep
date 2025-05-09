@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-const OFFICIAL_MCP_URL = 'http://localhost:3002/v1';
+const OFFICIAL_MCP_URL = 'http://localhost:3005/v1';
 
 async function testOfficialMcp() {
   try {

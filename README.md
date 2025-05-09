@@ -220,7 +220,7 @@ Both servers provide the same functionality but with different implementations.
 
 Both MCP servers run automatically when you start the main server with `npm run server`:
 - Custom MCP server listens on port 3001 by default (configurable with the MCP_PORT environment variable)
-- Official MCP server listens on port 3002 by default (configurable with the OFFICIAL_MCP_PORT environment variable)
+- Official MCP server listens on port 3005 by default (configurable with the OFFICIAL_MCP_PORT environment variable)
 
 ### Custom MCP Server
 
@@ -257,13 +257,13 @@ The official MCP server follows the MCP 1.0 specification using the official Typ
 
 ```bash
 # Natural language query
-curl -X POST http://localhost:3002/v1 \
+curl -X POST http://localhost:3005/v1 \
   -H "Content-Type: application/json" \
   -H "X-API-Key: <your-api-key>" \
   -d '{"messages": [{"role": "user", "content": "List all jets"}]}'
 
 # Direct function call
-curl -X POST http://localhost:3002/v1 \
+curl -X POST http://localhost:3005/v1 \
   -H "Content-Type: application/json" \
   -H "X-API-Key: <your-api-key>" \
   -d '{"functions": [{"name": "list_jets", "arguments": "{}"}]}'

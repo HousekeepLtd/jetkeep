@@ -20,7 +20,7 @@ const swaggerDocument = YAML.load(path.join(__dirname, '../openapi.yaml'));
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MCP_PORT = process.env.MCP_PORT || 3001;
-const OFFICIAL_MCP_PORT = process.env.OFFICIAL_MCP_PORT || 3002;
+const OFFICIAL_MCP_PORT = process.env.OFFICIAL_MCP_PORT || 3005;
 
 // Middleware
 app.use(cors());
