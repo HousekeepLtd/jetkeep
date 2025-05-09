@@ -1,0 +1,243 @@
+openapi: 3.0.0
+info:
+  title: JetKeep API
+  description: API for managing and tracking jets
+  version: 1.0.0
+  contact:
+    name: Housekeep Ltd
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://api.jetkeep.com
+    description: Production server
+
+paths:
+  /api/jets:
+    get:
+      summary: Get all jets
+      description: Returns a list of all jets in the database
+      operationId: getJets
+      tags:
+        - Jets
+      responses:
+        '200':
+          description: A list of jets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Jet'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: Create a new jet
+      description: Adds a new jet to the database
+      operationId: createJet
+      tags:
+        - Jets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JetInput'
+      responses:
+        '201':
+          description: Jet created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Jet'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/jets/{id}:
+    get:
+      summary: Get a jet by ID
+      description: Returns a single jet by its ID
+      operationId: getJetById
+      tags:
+        - Jets
+      parameters:
+        - name: id
+          in: path
+          description: ID of the jet to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Jet found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Jet'
+        '404':
+          description: Jet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      summary: Update a jet
+      description: Updates an existing jet's information
+      operationId: updateJet
+      tags:
+        - Jets
+      parameters:
+        - name: id
+          in: path
+          description: ID of the jet to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JetInput'
+      responses:
+        '200':
+          description: Jet updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Jet'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Jet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      summary: Delete a jet
+      description: Removes a jet from the database
+      operationId: deleteJet
+      tags:
+        - Jets
+      parameters:
+        - name: id
+          in: path
+          description: ID of the jet to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Jet deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Jet deleted successfully"
+        '404':
+          description: Jet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    JetInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Name of the jet
+          example: "Boeing 747"
+        type:
+          type: string
+          description: Type or model of the jet
+          example: "Commercial"
+        location:
+          type: string
+          description: Where the jet is stored or located
+          example: "Hangar 5"
+    
+    Jet:
+      type: object
+      required:
+        - _id
+        - name
+        - createdAt
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the jet
+          example: "60d21b4667d0d8992e610c85"
+        name:
+          type: string
+          description: Name of the jet
+          example: "Boeing 747"
+        type:
+          type: string
+          description: Type or model of the jet
+          example: "Commercial"
+        location:
+          type: string
+          description: Where the jet is stored or located
+          example: "Hangar 5"
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the jet was added
+          example: "2023-05-09T12:00:00Z"
+    
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "Failed to fetch jets"

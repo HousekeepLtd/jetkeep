@@ -129,6 +129,13 @@ The server will start at http://localhost:3000 (or the port specified in your `.
 - `PUT /api/jets/:id` - Update a jet
 - `DELETE /api/jets/:id` - Delete a jet
 
+### API Documentation
+
+The API is documented using OpenAPI/Swagger:
+
+- Access the interactive API documentation at: `http://localhost:3000/api-docs`
+- The OpenAPI schema is available at: `openapi.yaml`
+
 ### Creating a New Jet
 
 ```bash
