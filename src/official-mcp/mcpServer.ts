@@ -292,6 +292,9 @@ export const createMcpServer = async (port = 3001) => {
   // Handle MCP requests
   app.post('/v1', async (req, res) => {
     try {
+      console.log('Received MCP request:', JSON.stringify(req.body, null, 2));
+      console.log('Headers:', JSON.stringify(req.headers, null, 2));
+      
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined, // Stateless mode
       });
@@ -302,12 +305,27 @@ export const createMcpServer = async (port = 3001) => {
       });
       
       await server.connect(transport);
-      await transport.handleRequest(req, res, req.body);
+      
+      try {
+        await transport.handleRequest(req, res, req.body);
+      } catch (transportError) {
+        console.error('Transport error:', transportError);
+        // Don't send a response here, as the transport might have already started sending a response
+      }
     } catch (error) {
       console.error('MCP error:', error);
-      res.status(500).json({ 
-        error: 'An error occurred processing your request.' 
-      });
+      // Only send an error response if headers haven't been sent yet
+      if (!res.headersSent) {
+        res.status(500).json({ 
+          jsonrpc: "2.0",
+          error: {
+            code: -32603,
+            message: 'Internal server error',
+            data: error instanceof Error ? error.message : String(error)
+          },
+          id: req.body?.id || null
+        });
+      }
     }
   });
   
@@ -319,6 +337,27 @@ export const createMcpServer = async (port = 3001) => {
   // Root route
   app.get('/', (req, res) => {
     res.send('JetKeep Official MCP API is running. Send POST requests to /v1');
+  });
+  
+  // Debug endpoint
+  app.post('/v1/debug', (req, res) => {
+    console.log('Debug request:', JSON.stringify(req.body, null, 2));
+    console.log('Debug headers:', JSON.stringify(req.headers, null, 2));
+    
+    // Echo back the request plus some additional info
+    res.json({
+      received: {
+        body: req.body,
+        headers: req.headers
+      },
+      serverInfo: {
+        tools: Object.keys(server.tools).map(name => ({
+          name,
+          description: server.tools[name].description
+        })),
+        time: new Date().toISOString()
+      }
+    });
   });
   
   // Start the server

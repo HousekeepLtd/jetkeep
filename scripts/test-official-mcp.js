@@ -94,6 +94,26 @@ async function testOfficialMcp() {
     }, apiKey);
     console.log('Response:', functionCallResponse);
     
+    // Test 5: Debug endpoint
+    console.log('\nTest 5: Debug endpoint');
+    const debugResponse = await fetch(`${OFFICIAL_MCP_URL}/debug`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-API-Key': apiKey
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "list_jets",
+        id: "5",
+        params: {}
+      })
+    });
+    
+    const debugResult = await debugResponse.json();
+    console.log('Debug response:', JSON.stringify(debugResult, null, 2));
+    
     // Revoke API key when done
     console.log('\nRevoking API key...');
     await fetch('http://localhost:3000/api/auth/api-key', {
@@ -108,17 +128,32 @@ async function testOfficialMcp() {
 }
 
 async function callMcp(requestBody, apiKey) {
-  const response = await fetch(OFFICIAL_MCP_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json, text/event-stream',
-      'X-API-Key': apiKey
-    },
-    body: JSON.stringify(requestBody)
-  });
+  console.log('Sending request:', JSON.stringify(requestBody, null, 2));
   
-  return await response.json();
+  try {
+    const response = await fetch(OFFICIAL_MCP_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, text/event-stream',
+        'X-API-Key': apiKey
+      },
+      body: JSON.stringify(requestBody)
+    });
+    
+    const text = await response.text();
+    console.log('Raw response:', text);
+    
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.error('Error parsing JSON response:', e);
+      return { error: 'Failed to parse response', rawResponse: text };
+    }
+  } catch (error) {
+    console.error('Network error:', error);
+    return { error: `Network error: ${error.message}` };
+  }
 }
 
 testOfficialMcp();
