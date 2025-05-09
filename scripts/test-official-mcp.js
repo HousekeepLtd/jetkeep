@@ -99,6 +99,7 @@ async function callMcp(requestBody, apiKey) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json, text/event-stream',
       'X-API-Key': apiKey
     },
     body: JSON.stringify(requestBody)

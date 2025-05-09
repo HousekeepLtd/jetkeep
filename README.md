@@ -259,12 +259,14 @@ The official MCP server follows the MCP 1.0 specification using the official Typ
 # Natural language query
 curl -X POST http://localhost:3005/v1 \
   -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
   -H "X-API-Key: <your-api-key>" \
   -d '{"messages": [{"role": "user", "content": "List all jets"}]}'
 
 # Direct function call
 curl -X POST http://localhost:3005/v1 \
   -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
   -H "X-API-Key: <your-api-key>" \
   -d '{"functions": [{"name": "list_jets", "arguments": "{}"}]}'
 ```
