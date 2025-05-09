@@ -122,7 +122,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     
     // Update fields
     Object.keys(updateData).forEach(key => {
-      user[key] = updateData[key];
+      (user as any)[key] = updateData[key];
     });
     
     // Save user

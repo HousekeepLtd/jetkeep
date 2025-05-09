@@ -43,8 +43,10 @@ const displayJet = (jet: any, detailed = false) => {
   if (jet.type) console.log(chalk.gray(`  Type: ${jet.type}`));
   if (jet.location) console.log(chalk.gray(`  Location: ${jet.location}`));
   if (jet.status) {
-    // @ts-ignore - chalk dynamic method call
-    console.log(chalk[statusColor](`  Status: ${jet.status}`));
+    if (statusColor === 'green') console.log(chalk.green(`  Status: ${jet.status}`));
+    else if (statusColor === 'yellow') console.log(chalk.yellow(`  Status: ${jet.status}`));
+    else if (statusColor === 'red') console.log(chalk.red(`  Status: ${jet.status}`));
+    else console.log(chalk.blue(`  Status: ${jet.status}`));
   }
   if (detailed && jet.notes) console.log(chalk.gray(`  Notes: ${jet.notes}`));
   console.log(chalk.gray(`  Added: ${new Date(jet.createdAt).toLocaleString()}`));

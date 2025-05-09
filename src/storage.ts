@@ -67,6 +67,7 @@ export const addJet = async (jet: NewJet): Promise<Jet> => {
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
       ...jet,
+      owner: jet.owner || 'unknown', // Ensure owner is set
       status: jet.status || 'active' // Default status
     };
 
