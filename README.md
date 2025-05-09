@@ -256,19 +256,19 @@ curl -X POST http://localhost:3001/mcp/run \
 The official MCP server follows the MCP 1.0 specification using the official TypeScript SDK:
 
 ```bash
-# Natural language query
+# Natural language query (JSON-RPC 2.0 format)
 curl -X POST http://localhost:3005/v1 \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -H "X-API-Key: <your-api-key>" \
-  -d '{"messages": [{"role": "user", "content": "List all jets"}]}'
+  -d '{"jsonrpc": "2.0", "method": "chat", "id": "1", "params": {"messages": [{"role": "user", "content": "List all jets"}]}}'
 
-# Direct function call
+# Direct function call (JSON-RPC 2.0 format)
 curl -X POST http://localhost:3005/v1 \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -H "X-API-Key: <your-api-key>" \
-  -d '{"functions": [{"name": "list_jets", "arguments": "{}"}]}'
+  -d '{"jsonrpc": "2.0", "method": "list_jets", "id": "2", "params": {}}'
 ```
 
 ### Available MCP Functions (Both Servers)
