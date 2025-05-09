@@ -6,6 +6,18 @@ export interface Jet {
     createdAt: string;
     status?: 'active' | 'maintenance' | 'grounded';
     notes?: string;
+    owner: string;
+    passengers?: number;
+    range?: number;
+    cruiseSpeed?: number;
+    hourlyRate?: number;
+    dailyRate?: number;
+    weeklyRate?: number;
+    availability?: boolean;
+    availabilityNotes?: string;
+    description?: string;
+    amenities?: string[];
+    images?: string[];
 }
 export interface JetData {
     jets: Jet[];
@@ -16,6 +28,18 @@ export interface NewJet {
     location?: string;
     status?: 'active' | 'maintenance' | 'grounded';
     notes?: string;
+    owner?: string;
+    passengers?: number;
+    range?: number;
+    cruiseSpeed?: number;
+    hourlyRate?: number;
+    dailyRate?: number;
+    weeklyRate?: number;
+    availability?: boolean;
+    availabilityNotes?: string;
+    description?: string;
+    amenities?: string[];
+    images?: string[];
 }
 export interface UpdateJet {
     name?: string;
@@ -23,4 +47,67 @@ export interface UpdateJet {
     location?: string;
     status?: 'active' | 'maintenance' | 'grounded';
     notes?: string;
+    passengers?: number;
+    range?: number;
+    cruiseSpeed?: number;
+    hourlyRate?: number;
+    dailyRate?: number;
+    weeklyRate?: number;
+    availability?: boolean;
+    availabilityNotes?: string;
+    description?: string;
+    amenities?: string[];
+    images?: string[];
+}
+export interface Booking {
+    id: string;
+    jet: string | Jet;
+    customer: string;
+    startDate: string;
+    endDate: string;
+    totalPrice: number;
+    passengers?: number;
+    destination?: string;
+    currentStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+    statusHistory: BookingStatus[];
+    createdAt: string;
+}
+export interface BookingStatus {
+    status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+    updatedAt: string;
+    notes?: string;
+}
+export interface NewBooking {
+    jet: string;
+    startDate: string;
+    endDate: string;
+    passengers?: number;
+    destination?: string;
+}
+export interface UpdateBooking {
+    startDate?: string;
+    endDate?: string;
+    passengers?: number;
+    destination?: string;
+    status?: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+    statusNotes?: string;
+}
+export interface BookingAvailabilityCheck {
+    jetId: string;
+    startDate: string;
+    endDate: string;
+}
+export interface BookingPriceQuote {
+    jetId: string;
+    startDate: string;
+    endDate: string;
+}
+export interface PriceQuoteResponse {
+    hourlyRate: number;
+    dailyRate: number;
+    weeklyRate: number;
+    totalPrice: number;
+    durationHours: number;
+    durationDays: number;
+    jetName: string;
 }

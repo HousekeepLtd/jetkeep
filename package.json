@@ -15,9 +15,8 @@
     "server": "node dist/server.js",
     "server:dev": "tsx watch src/server.ts",
     "test:api": "tsx scripts/test-api.js",
-    "test:mcp": "tsx scripts/test-mcp.js",
     "test:auth": "tsx scripts/test-auth.js",
-    "test:official-mcp": "tsx scripts/test-official-mcp.js"
+    "test:booking": "tsx scripts/test-booking.js"
   },
   "keywords": [
     "cli",

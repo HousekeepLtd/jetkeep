@@ -613,6 +613,501 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  
+  /api/jets/available:
+    get:
+      summary: Get available jets
+      description: Returns jets that are available for booking in a specific time period
+      operationId: getAvailableJets
+      tags:
+        - Jets
+      parameters:
+        - name: startDate
+          in: query
+          description: Start date for availability check (ISO format)
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: End date for availability check (ISO format)
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: minPassengers
+          in: query
+          description: Minimum number of passengers
+          required: false
+          schema:
+            type: integer
+        - name: maxPrice
+          in: query
+          description: Maximum price for the rental
+          required: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: List of available jets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Jet'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/bookings:
+    get:
+      summary: Get bookings
+      description: Returns a list of bookings (filtered by user role)
+      operationId: getBookings
+      tags:
+        - Bookings
+      responses:
+        '200':
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: Create a booking
+      description: Creates a new booking for a jet
+      operationId: createBooking
+      tags:
+        - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingInput'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/bookings/{id}:
+    get:
+      summary: Get a booking by ID
+      description: Returns a single booking by its ID
+      operationId: getBookingById
+      tags:
+        - Bookings
+      parameters:
+        - name: id
+          in: path
+          description: ID of the booking to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Booking found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      summary: Update a booking
+      description: Updates an existing booking's details
+      operationId: updateBooking
+      tags:
+        - Bookings
+      parameters:
+        - name: id
+          in: path
+          description: ID of the booking to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdateInput'
+      responses:
+        '200':
+          description: Booking updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      summary: Delete a booking
+      description: Cancels and removes a booking
+      operationId: deleteBooking
+      tags:
+        - Bookings
+      parameters:
+        - name: id
+          in: path
+          description: ID of the booking to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Booking deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Booking deleted successfully"
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/bookings/{id}/status:
+    patch:
+      summary: Update booking status
+      description: Updates the status of a booking
+      operationId: updateBookingStatus
+      tags:
+        - Bookings
+      parameters:
+        - name: id
+          in: path
+          description: ID of the booking to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [pending, confirmed, cancelled, completed]
+                  description: New status for the booking
+                  example: "confirmed"
+                notes:
+                  type: string
+                  description: Notes about the status change
+                  example: "Confirmed after payment received"
+      responses:
+        '200':
+          description: Booking status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/bookings/availability:
+    post:
+      summary: Check jet availability
+      description: Checks if a jet is available for booking in a specific time period
+      operationId: checkAvailability
+      tags:
+        - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jetId
+                - startDate
+                - endDate
+              properties:
+                jetId:
+                  type: string
+                  description: ID of the jet to check
+                  example: "60d21b4667d0d8992e610c85"
+                startDate:
+                  type: string
+                  format: date-time
+                  description: Start date for availability check
+                  example: "2023-06-01T10:00:00Z"
+                endDate:
+                  type: string
+                  format: date-time
+                  description: End date for availability check
+                  example: "2023-06-03T14:00:00Z"
+      responses:
+        '200':
+          description: Availability check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+                    description: Whether the jet is available
+                    example: true
+                  jet:
+                    $ref: '#/components/schemas/Jet'
+                  conflictingBookings:
+                    type: array
+                    description: List of bookings that conflict (if any)
+                    items:
+                      $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Jet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/bookings/quote:
+    post:
+      summary: Get price quote
+      description: Returns a price quote for booking a jet
+      operationId: getPriceQuote
+      tags:
+        - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jetId
+                - startDate
+                - endDate
+              properties:
+                jetId:
+                  type: string
+                  description: ID of the jet to get a quote for
+                  example: "60d21b4667d0d8992e610c85"
+                startDate:
+                  type: string
+                  format: date-time
+                  description: Start date for the booking
+                  example: "2023-06-01T10:00:00Z"
+                endDate:
+                  type: string
+                  format: date-time
+                  description: End date for the booking
+                  example: "2023-06-03T14:00:00Z"
+                passengers:
+                  type: integer
+                  description: Number of passengers
+                  example: 4
+      responses:
+        '200':
+          description: Price quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceQuote'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Jet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   securitySchemes:
@@ -826,6 +1321,9 @@ components:
       type: object
       required:
         - name
+        - hourlyRate
+        - dailyRate
+        - weeklyRate
       properties:
         name:
           type: string
@@ -839,6 +1337,30 @@ components:
           type: string
           description: Where the jet is stored or located
           example: "Hangar 5"
+        passengers:
+          type: integer
+          description: Maximum number of passengers
+          example: 10
+        range:
+          type: integer
+          description: Range in miles
+          example: 5000
+        cruiseSpeed:
+          type: integer
+          description: Cruise speed in mph
+          example: 550
+        hourlyRate:
+          type: number
+          description: Cost per hour of rental
+          example: 15000
+        dailyRate:
+          type: number
+          description: Cost per day of rental
+          example: 100000
+        weeklyRate:
+          type: number
+          description: Cost per week of rental
+          example: 600000
     
     Jet:
       type: object
@@ -847,6 +1369,9 @@ components:
         - name
         - createdAt
         - owner
+        - hourlyRate
+        - dailyRate
+        - weeklyRate
       properties:
         _id:
           type: string
@@ -873,6 +1398,189 @@ components:
           format: date-time
           description: Date and time when the jet was added
           example: "2023-05-09T12:00:00Z"
+        passengers:
+          type: integer
+          description: Maximum number of passengers
+          example: 10
+        range:
+          type: integer
+          description: Range in miles
+          example: 5000
+        cruiseSpeed:
+          type: integer
+          description: Cruise speed in mph
+          example: 550
+        hourlyRate:
+          type: number
+          description: Cost per hour of rental
+          example: 15000
+        dailyRate:
+          type: number
+          description: Cost per day of rental
+          example: 100000
+        weeklyRate:
+          type: number
+          description: Cost per week of rental
+          example: 600000
+        
+    BookingInput:
+      type: object
+      required:
+        - jet
+        - startDate
+        - endDate
+      properties:
+        jet:
+          type: string
+          description: ID of the jet to book
+          example: "60d21b4667d0d8992e610c85"
+        startDate:
+          type: string
+          format: date-time
+          description: Start date and time of booking
+          example: "2023-06-01T10:00:00Z"
+        endDate:
+          type: string
+          format: date-time
+          description: End date and time of booking
+          example: "2023-06-03T14:00:00Z"
+        passengers:
+          type: integer
+          description: Number of passengers
+          example: 4
+        destination:
+          type: string
+          description: Destination for the flight
+          example: "Paris, France"
+          
+    BookingUpdateInput:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date-time
+          description: New start date and time
+          example: "2023-06-01T12:00:00Z"
+        endDate:
+          type: string
+          format: date-time
+          description: New end date and time
+          example: "2023-06-03T16:00:00Z"
+        passengers:
+          type: integer
+          description: Updated number of passengers
+          example: 6
+        destination:
+          type: string
+          description: Updated destination
+          example: "Rome, Italy"
+          
+    Booking:
+      type: object
+      required:
+        - _id
+        - jet
+        - customer
+        - startDate
+        - endDate
+        - totalPrice
+        - currentStatus
+        - createdAt
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the booking
+          example: "60d21b4667d0d8992e610c85"
+        jet:
+          type: string
+          description: ID of the booked jet
+          example: "60d21b4667d0d8992e610c85"
+        customer:
+          type: string
+          description: ID of the customer who made the booking
+          example: "60d21b4667d0d8992e610c85"
+        startDate:
+          type: string
+          format: date-time
+          description: Start date and time of booking
+          example: "2023-06-01T10:00:00Z"
+        endDate:
+          type: string
+          format: date-time
+          description: End date and time of booking
+          example: "2023-06-03T14:00:00Z"
+        totalPrice:
+          type: number
+          description: Total price for the booking
+          example: 250000
+        passengers:
+          type: integer
+          description: Number of passengers
+          example: 4
+        destination:
+          type: string
+          description: Destination for the flight
+          example: "Paris, France"
+        currentStatus:
+          type: string
+          enum: [pending, confirmed, cancelled, completed]
+          description: Current status of the booking
+          example: "confirmed"
+        statusHistory:
+          type: array
+          description: History of status changes
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [pending, confirmed, cancelled, completed]
+                example: "confirmed"
+              updatedAt:
+                type: string
+                format: date-time
+                example: "2023-05-15T09:30:00Z"
+              notes:
+                type: string
+                example: "Payment received"
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the booking was created
+          example: "2023-05-09T12:00:00Z"
+          
+    PriceQuote:
+      type: object
+      required:
+        - hourlyRate
+        - dailyRate
+        - weeklyRate
+        - totalPrice
+        - durationHours
+        - jet
+      properties:
+        hourlyRate:
+          type: number
+          description: Hourly rate for the jet
+          example: 15000
+        dailyRate:
+          type: number
+          description: Daily rate for the jet
+          example: 100000
+        weeklyRate:
+          type: number
+          description: Weekly rate for the jet
+          example: 600000
+        totalPrice:
+          type: number
+          description: Total calculated price for the booking
+          example: 250000
+        durationHours:
+          type: number
+          description: Duration of booking in hours
+          example: 52
+        jet:
+          $ref: '#/components/schemas/Jet'
     
     Error:
       type: object

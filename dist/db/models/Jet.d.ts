@@ -1,41 +1,28 @@
 import mongoose from 'mongoose';
-declare const _default: mongoose.Model<{
+export interface IJet extends mongoose.Document {
+    status?: 'active' | 'maintenance' | 'grounded';
     name: string;
-    createdAt: NativeDate;
-    type?: string | null | undefined;
-    location?: string | null | undefined;
-}, {}, {}, {}, mongoose.Document<unknown, {}, {
-    name: string;
-    createdAt: NativeDate;
-    type?: string | null | undefined;
-    location?: string | null | undefined;
-}, {}> & {
-    name: string;
-    createdAt: NativeDate;
-    type?: string | null | undefined;
-    location?: string | null | undefined;
-} & {
-    _id: mongoose.Types.ObjectId;
-} & {
-    __v: number;
-}, mongoose.Schema<any, mongoose.Model<any, any, any, any, any, any>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, {
-    name: string;
-    createdAt: NativeDate;
-    type?: string | null | undefined;
-    location?: string | null | undefined;
-}, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
-    name: string;
-    createdAt: NativeDate;
-    type?: string | null | undefined;
-    location?: string | null | undefined;
-}>, {}> & mongoose.FlatRecord<{
-    name: string;
-    createdAt: NativeDate;
-    type?: string | null | undefined;
-    location?: string | null | undefined;
+    type?: string;
+    location?: string;
+    owner: mongoose.Types.ObjectId;
+    passengers: number;
+    range: number;
+    cruiseSpeed: number;
+    hourlyRate: number;
+    dailyRate: number;
+    weeklyRate: number;
+    availability: boolean;
+    availabilityNotes?: string;
+    description?: string;
+    amenities?: string[];
+    images?: string[];
+    createdAt: Date;
+    calculatePrice(startDate: Date, endDate: Date): number;
+    isAvailableForBooking(startDate: Date, endDate: Date): Promise<boolean>;
+}
+declare const _default: mongoose.Model<IJet, {}, {}, {}, mongoose.Document<unknown, {}, IJet, {}> & IJet & Required<{
+    _id: unknown;
 }> & {
-    _id: mongoose.Types.ObjectId;
-} & {
     __v: number;
-}>>;
+}, any>;
 export default _default;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, {SignOptions} from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../db/models/User.js';
 
@@ -159,5 +159,5 @@ export const revokeApiKey = async (req: Request, res: Response): Promise<void> =
 
 // Helper function to generate JWT
 const generateToken = (userId: string): string => {
-  return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+  return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: JWT_EXPIRY } as SignOptions);
 };

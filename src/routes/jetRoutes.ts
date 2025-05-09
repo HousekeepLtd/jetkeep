@@ -17,6 +17,9 @@ router.use((req, res, next) => {
   });
 });
 
+// Get available jets for booking (customers can see)
+router.get('/available', jetController.getAvailableJets);
+
 // Get all jets (users see their own, admins see all)
 router.get('/', jetController.getJets);
 

@@ -9,8 +9,7 @@ import { connectDB } from './db/connection.js';
 import jetRoutes from './routes/jetRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import { createMcpServer as createCustomMcpServer } from './mcp/mcpServer.js';
-import { createMcpServer as createOfficialMcpServer } from './official-mcp/mcpServer.js';
+import bookingRoutes from './routes/bookingRoutes.js';
 
 dotenv.config();
 
@@ -33,6 +32,7 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/jets', jetRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -77,15 +77,5 @@ app.listen(PORT, () => {
   // Create admin user after server starts
   createAdminUser();
 });
-
-// Start custom MCP server
-const mcpServer = createCustomMcpServer(Number(MCP_PORT));
-mcpServer.start();
-console.log(`Custom MCP Server running on port ${MCP_PORT}`);
-
-// Start official MCP server
-const officialMcpServer = await createOfficialMcpServer(Number(OFFICIAL_MCP_PORT));
-officialMcpServer.start();
-console.log(`Official MCP Server running on port ${OFFICIAL_MCP_PORT}`);
 
 export default app;
